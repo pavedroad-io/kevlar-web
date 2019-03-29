@@ -14,9 +14,11 @@ type PrToken struct {
 	Kind         string    `json:"PrToken"`
     Metadata struct {
 	    Name      string    `json:"defauult-name"`
-	    Namespace string    `json:"defauult-name"`
+	    Namespace string    `json:"defauult-namespace"`
 	    Uid       string    `json:"defauult-name"`
-	    Token     string    `json:"defauult-name"`
+	    Site      string    `json:"github"`
+	    EndPoint  string    `json:"api.githubm.com"`
+	    Token     string    `json:""`
         Scope     []string
     }
 	Created       time.Time

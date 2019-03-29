@@ -63,7 +63,6 @@ func (a *prTokenApp) Run(addr string) {
 //
 // Delete a specific toke
 // DELETE /api/v1/namespace/pavedroad.io/prToken/{usertoken}
-
 func (a *prTokenApp) initializeRoutes() {
     //Get list of tokens
 	uri := PrTokenAPIVersion + "/" + PrTokenNamespaceID + "/{namespace}/" +
@@ -97,6 +96,8 @@ func (a *prTokenApp) initializeRoutes() {
 
 }
 
+// getTokens
+// return a list of all tokens
 func (a *prTokenApp) getTokens(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
     fmt.Println(vars)
@@ -120,21 +121,29 @@ func (a *prTokenApp) getTokens(w http.ResponseWriter, r *http.Request) {
 	//respondWithJSON(w, http.StatusOK, u)
 }
 
+// getTokens
+// return a token
 func (a *prTokenApp) getToken(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
     fmt.Println(vars)
 }
 
+// createToken
+// Use POST to create a token
 func (a *prTokenApp) createToken(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
     fmt.Println(vars)
 }
 
+// updateToken
+// Use PUT to update a token
 func (a *prTokenApp) updateToken(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
     fmt.Println(vars)
 }
 
+// deleteToken
+// Use DELETE to delete a token
 func (a *prTokenApp) deleteToken(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
     fmt.Println(vars)
