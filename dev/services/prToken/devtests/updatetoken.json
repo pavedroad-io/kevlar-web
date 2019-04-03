@@ -1,0 +1,13 @@
+{ "apiVersion" :"core.pavedroad.io/v1alpha1",
+  "kind" : "PrToken",
+  "metadata" : {
+      "name" : "jscharber-github-token",
+      "namespace" : "pavedroad.io",
+      "uid" : "ef3f33e8-42f8-4671-b15b-11ec4d61ad34",
+      "site" : "github",
+      "endPoint": "https://api.github.com",
+      "token" : "mytoken",
+      "scope" : ["user", "repo"]
+    },
+    "active"  : false
+}

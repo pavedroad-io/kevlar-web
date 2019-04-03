@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"database/sql"
 	"encoding/json"
+	"errors"
+	"os"
 )
 
 type PrToken struct {
@@ -26,6 +28,27 @@ type PrToken struct {
 	Active  bool   `json:"active"`
 }
 
+// updateToken in database
+// Store the UID created as a database key in the prtoken struct
+func (t *PrToken) updateToken(db *sql.DB) error {
+        jb, err := json.Marshal(t)
+        if err != nil {
+		fmt.Println("marshall failed")
+                panic(err)
+        }
+
+	statement := fmt.Sprintf("UPDATE kevlarweb.prtoken SET prtoken='%s' WHERE uid ='%s'",jb, t.Metadata.UID)
+	//fmt.Println(statement)
+	_, er1 := db.Query(statement)
+
+	if er1 != nil {
+		//TODO(jscharber): convert to log message
+		fmt.Println("Update failed")
+		return er1
+	}
+
+	return nil
+}
 // createToken in database
 // Store the UID created as a database key in the prtoken struct
 func (t *PrToken) createToken(db *sql.DB) error {
@@ -55,4 +78,82 @@ func (t *PrToken) createToken(db *sql.DB) error {
 	}
 
 	return nil
+}
+
+// getTokens: return a list of tokens
+// 
+func (t *PrToken) getTokens(db *sql.DB, start, count int) ([]PrToken,error) {
+	statement := fmt.Sprintf("SELECT uid, prtoken FROM kevlarweb.prtoken LIMIT %d OFFSET %d", count, start)
+	//fmt.Println(statement)
+	rows, err := db.Query(statement)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	tokens := []PrToken{}
+
+	for rows.Next() {
+		var t PrToken
+		var jb []byte
+		var uid string
+		err := rows.Scan(&uid, &jb)
+		err = json.Unmarshal(jb, &t)
+		t.Metadata.UID = uid
+		//fmt.Println(uid, string(jb))
+        	if err != nil {
+                	fmt.Println(err)
+                	os.Exit(1)
+        	}
+		tokens = append(tokens, t)
+	}
+
+	return tokens, nil
+}
+
+// getToken: return a token based on UID
+// 
+func (t *PrToken) getToken(db *sql.DB, uid string) (error) {
+	statement := fmt.Sprintf("SELECT uid, prtoken FROM kevlarweb.prtoken WHERE UID = '%s'", uid)
+	rows, err := db.Query(statement)
+	//fmt.Println(statement)
+
+	if err != nil {
+		return err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var jb []byte
+		var uid string
+		err := rows.Scan(&uid, &jb)
+		err = json.Unmarshal(jb, t)
+		t.Metadata.UID = uid
+		//fmt.Println(uid, string(jb))
+        	if err != nil {
+                	fmt.Println(err)
+                	os.Exit(1)
+        	}
+	}
+
+	return nil
+}
+
+// deleteToken: return a token based on UID
+// 
+func (t *PrToken) deleteToken(db *sql.DB, uid string) (error) {
+	statement := fmt.Sprintf("DELETE FROM kevlarweb.prtoken WHERE UID = '%s'", uid)
+	result, err := db.Exec(statement)
+	//fmt.Println(statement)
+	c, e := result.RowsAffected()
+
+	if e == nil && c == 0 {
+		em := "UID: "+uid+ " does not exist"
+		return errors.New(em)
+	}
+
+	return err
 }
