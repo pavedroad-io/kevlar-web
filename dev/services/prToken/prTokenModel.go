@@ -34,7 +34,7 @@ func (t *PrToken) createToken(db *sql.DB) error {
                 panic(err)
         }
 
-	statement := fmt.Sprintf("INSERT INTO prtoken(prtoken) VALUES('%s') RETURNING uid", jb)
+	statement := fmt.Sprintf("INSERT INTO kevlarweb.prtoken(prtoken) VALUES('%s') RETURNING uid", jb)
 	//fmt.Println(statement)
 	rows, er1 := db.Query(statement)
 
