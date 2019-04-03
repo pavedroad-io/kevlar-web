@@ -23,7 +23,7 @@ const (
 	PrTokenAPIVersion       string = "/api/v1"
 	PrTokenNamespaceID      string = "namespace"
 	PrTokenDefaultNamespace string = "pavedroad.io"
-	PrTokenResourceType     string = "prToken"
+	PrTokenResourceType     string = "prTokens"
 )
 
 type prTokenApp struct {
@@ -89,7 +89,7 @@ func (a *prTokenApp) initializeRoutes() {
 
 	//Create a token
 	uri = PrTokenAPIVersion + "/" + PrTokenNamespaceID + "/{namespace}/" +
-		PrTokenResourceType + "/{usertoken}"
+		PrTokenResourceType
 	a.Router.HandleFunc(uri, a.createToken).Methods("POST")
 	fmt.Println("POST" + uri)
 
