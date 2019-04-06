@@ -5,21 +5,22 @@
 package main
 
 import (
+	_ "bytes"
 	"database/sql"
-	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
 	"os"
-	"time"
-	_ "bytes"
 	"strconv"
+	"time"
 )
 
 const (
+	//
 	PrTokenAPIVersion       string = "/api/v1"
 	PrTokenNamespaceID      string = "namespace"
 	PrTokenDefaultNamespace string = "pavedroad.io"
@@ -37,7 +38,7 @@ func (a *prTokenApp) Initialize(user, password, dbname string, sslmode string, s
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s port=%s",
 		user, password, dbname, sslmode, dbIp, dbPort)
 
-	fmt.Println(sqldriver, connectionString)
+	//fmt.Println(sqldriver, connectionString)
 	var err error
 	a.DB, err = sql.Open(sqldriver, connectionString)
 	if err != nil {
@@ -110,7 +111,7 @@ func (a *prTokenApp) initializeRoutes() {
 // getTokens
 // return a list of all tokens
 func (a *prTokenApp) getTokens(w http.ResponseWriter, r *http.Request) {
-        Token := PrToken{}
+	Token := PrToken{}
 
 	//vars := mux.Vars(r)
 	//fmt.Println("list tokens: ", vars)
@@ -137,11 +138,11 @@ func (a *prTokenApp) getTokens(w http.ResponseWriter, r *http.Request) {
 // getToken: return a token given a UID
 func (t *prTokenApp) getToken(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-        Token := PrToken{}
+	Token := PrToken{}
 
 	err := Token.getToken(t.DB, vars["uid"])
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -151,12 +152,12 @@ func (t *prTokenApp) getToken(w http.ResponseWriter, r *http.Request) {
 // createToken
 // Use POST to create a token
 func (a *prTokenApp) createToken(w http.ResponseWriter, r *http.Request) {
-        // New token structure
-        Token := PrToken{}
+	// New token structure
+	Token := PrToken{}
 
 	// Read URI variables
-	vars := mux.Vars(r)
-	fmt.Println(vars)
+	//vars := mux.Vars(r)
+	//fmt.Println(vars)
 
 	htmlData, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -164,7 +165,7 @@ func (a *prTokenApp) createToken(w http.ResponseWriter, r *http.Request) {
 		os.Exit(1)
 	}
 
-        err = json.Unmarshal(htmlData, &Token)
+	err = json.Unmarshal(htmlData, &Token)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -174,15 +175,14 @@ func (a *prTokenApp) createToken(w http.ResponseWriter, r *http.Request) {
 	//json.Indent(&out, htmlData, "", "\t")
 	//out.WriteTo(os.Stdout)
 
-        ct := time.Now().UTC()
-        Token.Created = ct.Format(time.RFC3339)
-        Token.Updated = ct.Format(time.RFC3339)
-
+	ct := time.Now().UTC()
+	Token.Created = ct.Format(time.RFC3339)
+	Token.Updated = ct.Format(time.RFC3339)
 
 	if err := Token.createToken(a.DB); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
-	}	
+	}
 
 	//fmt.Println(Token)
 	respondWithJSON(w, http.StatusCreated, Token)
@@ -191,8 +191,8 @@ func (a *prTokenApp) createToken(w http.ResponseWriter, r *http.Request) {
 // updateToken
 // Use PUT to update a token
 func (a *prTokenApp) updateToken(w http.ResponseWriter, r *http.Request) {
-        // New token structure
-        Token := PrToken{}
+	// New token structure
+	Token := PrToken{}
 
 	// Read URI variables
 	vars := mux.Vars(r)
@@ -203,7 +203,7 @@ func (a *prTokenApp) updateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-        err = json.Unmarshal(htmlData, &Token)
+	err = json.Unmarshal(htmlData, &Token)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -211,29 +211,28 @@ func (a *prTokenApp) updateToken(w http.ResponseWriter, r *http.Request) {
 
 	if vars["uid"] != Token.Metadata.UID {
 		//TODO(jscharber): Change to log message
-		em := "UID: " + vars["uid"] + "in does not match payload [" + Token.Metadata.UID +"]"
+		em := "UID: " + vars["uid"] + "in does not match payload [" + Token.Metadata.UID + "]"
 		fmt.Println(em)
-                return
+		return
 	}
 
-        ct := time.Now().UTC()
-        Token.Updated = ct.Format(time.RFC3339)
-
+	ct := time.Now().UTC()
+	Token.Updated = ct.Format(time.RFC3339)
 
 	if err := Token.updateToken(a.DB); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
-	}	
+	}
 
 	//fmt.Println(Token)
-	respondWithJSON(w, http.StatusCreated, Token)
+	respondWithJSON(w, http.StatusOK, Token)
 
 }
 
 // deleteToken
 // Use DELETE to delete a token
 func (a *prTokenApp) deleteToken(w http.ResponseWriter, r *http.Request) {
-        Token := PrToken{}
+	Token := PrToken{}
 	vars := mux.Vars(r)
 
 	err := Token.deleteToken(a.DB, vars["uid"])

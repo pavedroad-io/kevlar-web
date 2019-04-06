@@ -1,48 +1,117 @@
+#-include .env
+
+#VERSION := $(shell git describe --tags)
+VERSION := 0.0.1-poc
+BUILD := $(shell git rev-parse --short HEAD)
+PROJECTNAME := $(shell basename "$(PWD)")
+TARGET := $(PROJECTNAME)
+
+# Go related variables.
+GOBASE := $(shell pwd)
+GOPATH := $(GOBASE)/vendor:$(GOBASE)
+GOBIN := $(GOBASE)/bin
+GOFILES := $(wildcard *.go)
+GOLINT := "/usr/bin/golint"
+
 SHELL := /bin/bash
-
-# The name of the executable (default is current directory name)
-TARGET := $(shell echo $${PWD\#\#*/})
-.DEFAULT_GOAL: $(TARGET)
-
-# These will be provided to the target
-VERSION := 1.0.0-poc
-BUILD := `git rev-parse HEAD`
 
 # Use linker flags to provide version/build settings to the target
 LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
 
-# go source files, ignore vendor directory
-SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
+# Redirect error output to a file, so we can show it in development mode.
+STDERR := ./$(PROJECTNAME)-stderr.txt
 
-.PHONY: all build clean install uninstall fmt simplify check run
+# PID file will keep the process id of the server
+PID := /tmp/.$(PROJECTNAME).pid
 
-all: check install
+# Make is verbose in Linux. Make it silent.
+# MAKEFLAGS += --silent
 
-$(TARGET): $(SRC)
-	@go build $(LDFLAGS) -o $(TARGET)
+.PHONY: check go-build compile
 
-build: $(TARGET)
-	@true
+all: check compile
 
+## install: Install missing dependencies. Runs `go get` internally. e.g; make install get=github.com/foo/bar
+install: go-get
+
+#.DEFAULT_GOAL: $(TARGET)
+
+## start: Start in development mode. Auto-starts when code changes.
+start:
+	@bash -c "trap 'make stop' EXIT; $(MAKE) clean compile start-server watch run='make clean compile start-server'"
+
+## stop: Stop development mode.
+stop: stop-server
+
+start-server: stop-server
+	@echo "  >  $(PROJECTNAME) is available at $(ADDR)"
+	@-$(GOBIN)/$(PROJECTNAME) 2>&1 & echo $$! > $(PID)
+	@cat $(PID) | sed "/^/s/^/  \>  PID: /"
+
+stop-server:
+	@-touch $(PID)
+	@-kill `cat $(PID)` 2> /dev/null || true
+	@-rm $(PID)
+
+## watch: Run given command when code changes. e.g; make watch run="echo 'hey'"
+watch:
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) yolo -i . -e vendor -e bin -c "$(run)"
+
+restart-server: stop-server start-server
+
+## compile: Compile the binary.
+compile:
+	@-$(MAKE) -s go-compile
+
+## exec: Run given command, wrapped with custom GOPATH. e.g; make exec run="go test ./..."
+exec:
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) $(run)
+
+## clean: Clean build files. Runs `go clean` internally.
 clean:
-	@rm -f $(TARGET)
+	@-rm $(GOBIN)/$(PROJECTNAME) 2> /dev/null
+	@-$(MAKE) go-clean
 
-install:
-	@go install $(LDFLAGS)
+go-compile: go-get go-build
 
-uninstall: clean
-	@rm -f $$(which ${TARGET})
+go-build:
+	@echo "  >  Building binary..."
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROJECTNAME) $(GOFILES)
 
-fmt:
-	@gofmt -l -w $(SRC)
+go-generate:
+	@echo "  >  Generating dependency files..."
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go generate $(generate)
 
-simplify:
-	@gofmt -s -l -w $(SRC)
+go-get:
+	@echo "  >  Checking if there is any missing dependencies..."
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
 
-check:
-	@test -z $(shell gofmt -l *.go | tee /dev/stderr) || echo "[WARN] Fix formatting issues with 'make fmt'"
-	@for d in $$(go list ./... | grep -v /vendor/); do golint $${d}; done
-	@go tool vet ${SRC}
+go-install:
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go install $(GOFILES)
 
-run: install
-	@$(TARGET)
+go-clean:
+	@echo "  >  Cleaning build cache"
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
+
+check: lint
+	@echo "  >  running to tests..."
+	go test -v ./...
+
+lint: $(GOFILES)
+	@echo "  >  running lint..."
+	@echo $?
+	$(GOLINT) $?
+
+fmt: $(GOFILES)
+	@gofmt -l -w $?
+
+simplify: $(GOFILES)
+	@gofmt -s -l -w $?
+
+help: Makefile
+	@echo
+	@echo " Choose a command run in "$(PROJECTNAME)":"
+	@echo
+	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
+	@echo
+
