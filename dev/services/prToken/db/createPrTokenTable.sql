@@ -3,4 +3,4 @@ CREATE TABLE IF NOT EXISTS kevlarweb.prToken (
     prToken JSONB
 );
 
-CREATE INDEX prTokenIdx ON kevlarweb.prToken USING GIN (prToken);
+CREATE INDEX IF NOT EXISTS prTokenIdx ON kevlarweb.prToken USING GIN (prToken);
