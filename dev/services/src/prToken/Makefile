@@ -1,17 +1,17 @@
 #-include .env
 
-#VERSION := $(shell git describe --tags)
 VERSION := 0.0.1-poc
 BUILD := $(shell git rev-parse --short HEAD)
 PROJECTNAME := $(shell basename "$(PWD)")
 TARGET := $(PROJECTNAME)
 
 # Go related variables.
-GOBASE := $(shell pwd)
-GOPATH := $(GOBASE)/vendor:$(GOBASE)
+GOBASE := $(shell cd ../../;pwd)
+#GOPATH := $(GOBASE)/vendor:$(GOBASE)
+GOPATH := $(GOBASE)
 GOBIN := $(GOBASE)/bin
 GOFILES := $(wildcard *.go)
-GOLINT := "/usr/bin/golint"
+GOLINT := $(shell which golint)
 
 SHELL := /bin/bash
 
@@ -27,7 +27,7 @@ PID := /tmp/.$(PROJECTNAME).pid
 # Make is verbose in Linux. Make it silent.
 # MAKEFLAGS += --silent
 
-.PHONY: check go-build compile
+.PHONY: check go-build compile sonar-scanner
 
 all: check compile
 
@@ -78,9 +78,13 @@ go-build:
 	@echo "  >  Building binary..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROJECTNAME) $(GOFILES)
 
-go-generate:
+go-generate: Gopkg
 	@echo "  >  Generating dependency files..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go generate $(generate)
+
+Gopkg: Gopkg.toml
+	@echo "  >  initialize dep support..."
+	dep init
 
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
@@ -93,9 +97,12 @@ go-clean:
 	@echo "  >  Cleaning build cache"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
 
-check: lint
+check: sonar-scanner lint
 	@echo "  >  running to tests..."
 	go test -v ./...
+
+sonar-scanner:
+	./sonarcloud.sh
 
 lint: $(GOFILES)
 	@echo "  >  running lint..."
