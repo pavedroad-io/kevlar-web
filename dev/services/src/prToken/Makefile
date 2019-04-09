@@ -1,17 +1,19 @@
 #-include .env
 
-#VERSION := $(shell git describe --tags)
 VERSION := 0.0.1-poc
 BUILD := $(shell git rev-parse --short HEAD)
 PROJECTNAME := $(shell basename "$(PWD)")
+PROJDIR := $(shell pwd)
 TARGET := $(PROJECTNAME)
 
 # Go related variables.
-GOBASE := $(shell pwd)
-GOPATH := $(GOBASE)/vendor:$(GOBASE)
+GOBASE := $(shell cd ../../;pwd)
+#GOPATH := $(GOBASE)/vendor:$(GOBASE)
+GOPATH := $(GOBASE)
 GOBIN := $(GOBASE)/bin
 GOFILES := $(wildcard *.go)
-GOLINT := "/usr/bin/golint"
+GOLINT := $(shell which golint)
+ASSETS := "$(PROJDIR)/assets/images"
 
 SHELL := /bin/bash
 
@@ -27,7 +29,7 @@ PID := /tmp/.$(PROJECTNAME).pid
 # Make is verbose in Linux. Make it silent.
 # MAKEFLAGS += --silent
 
-.PHONY: check go-build compile
+.PHONY: check go-build compile sonar-scanner
 
 all: check compile
 
@@ -78,12 +80,21 @@ go-build:
 	@echo "  >  Building binary..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROJECTNAME) $(GOFILES)
 
-go-generate:
+go-generate: Gopkg
 	@echo "  >  Generating dependency files..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go generate $(generate)
+	dep status -dot | dot -T png
+	@echo "  >  Generating dependency files..."
 
-go-get:
+Gopkg: Gopkg.toml
+	@echo "  >  initialize dep support..."
+	dep init
+
+go-get: $(ASSETS)
 	@echo "  >  Checking if there is any missing dependencies..."
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
+	@echo "  >  Creating dependencies graph png..."
+	$(shell dep status -dot | dot -T png -o $(ASSETS)/$(PROJECTNAME).png)
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
 
 go-install:
@@ -93,9 +104,12 @@ go-clean:
 	@echo "  >  Cleaning build cache"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
 
-check: lint
+check: sonar-scanner lint
 	@echo "  >  running to tests..."
 	go test -v ./...
+
+sonar-scanner:
+	./sonarcloud.sh
 
 lint: $(GOFILES)
 	@echo "  >  running lint..."
@@ -115,3 +129,8 @@ help: Makefile
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 	@echo
 
+$(ASSETS):
+	@echo
+	@echo " make asset directory "$(ASETS)" "
+	@echo
+	$(shell mkdir -p $(ASSETS))
