@@ -1,18 +1,9 @@
 version: '3'
 
 services:
-  prtoken:
-    image: kevlar/prtoken:0.0
-    expose:
-     - "8081"
-    ports: 
-     - 8081:8081
   roach-ui:
     image: cockroachdb/cockroach
     command: start --insecure
-    expose:
-     - "8080"
-     - "26257"
     ports:
      - "26257:26257"
      - "6060:8080"

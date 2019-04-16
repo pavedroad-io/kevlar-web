@@ -4,7 +4,7 @@ FROM golang:latest
 LABEL "vendor": "PavedRoad.io" \
       "microservice": "prToken" \
       "description": "Stores OAUTH access tokens" \
-      "version": "0.0" \
+      "version": "0.0.1" \
       "env": "dev"
 
 MAINTAINER "support@pavedroad.io"
