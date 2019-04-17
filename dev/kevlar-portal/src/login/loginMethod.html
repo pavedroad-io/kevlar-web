@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<HTML lang="eg">
+<header>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+   <!-- social buttons and fonts -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/4.12.0/bootstrap-social.min.css">
+
+</header>
+
+<div class="row h-100 justify-content-center align-items-center">
+  <aside class="col-sm-3">
+<div class="card">
+<article class="card-body">
+  <h4 class="card-title text-center mb-4 mt-1">
+    Pick your login method
+  </h4>
+  <hr>
+  <a id="bitbucker-button" class="btn btn-block btn-social btn-bitbucket">
+    <i class="fa fa-bitbucket"></i> Sign in with BitBucker
+  </a>
+
+  <a id="github-button" class="btn btn-block btn-social btn-github">
+    <i class="fa fa-github"></i> Sign in with Github
+  </a>
+
+  <a id="google-button" class="btn btn-block btn-social btn-google">
+    <i class="fa fa-google"></i> Sign in with Google
+  </a>
+
+  <a id="ms-button" class="btn btn-block btn-social btn-microsoft">
+    <i class="fa fa-windows"></i> Sign in with Microsoft
+  </a>
+</article>
+</div> <!-- card.// -->
+
+  </aside> <!-- col.// -->
+</div> <!-- row.// -->
+
+</div>
+
+    <script>
+      $('#github-button').on('click', function() {
+
+        window.location.href = "loginForm.html"
+      })
+    </script>
+</html

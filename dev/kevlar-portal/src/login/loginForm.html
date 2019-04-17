@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<HTML lang="eg">
+<header>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+</header>
+
+
+<div class="row h-100 justify-content-center align-items-center">
+	<aside class="col-sm-3">
+<div class="card">
+<article class="card-body">
+  <h4 class="card-title text-center mb-4 mt-1">
+    <img src="../assets/images/GitHub-Mark/PNG/GitHub-Mark-32px.png" alt="foobar">GitHub
+  </h4>
+	<hr>
+	<p class="text-success text-center">Connect Kevlar to your GitHub account</p>
+	<form>
+	<div class="form-group">
+	<div class="input-group">
+		<div class="input-group-prepend">
+		    <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+		</div>
+		<input name="loginID" id="loginID" class="form-control" placeholder="GitHub ID" type="text">
+	</div> <!-- input-group.// -->
+	</div> <!-- form-group// -->
+	<div class="form-group">
+	<div class="input-group">
+		<div class="input-group-prepend">
+		    <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+		 </div>
+	    <input class="form-control" id="password" placeholder="******" type="password">
+	</div> <!-- input-group.// -->
+	</div> <!-- form-group// -->
+	<div class="form-group">
+	<button id="submitLogin" type="button" class="btn btn-primary btn-block"> Login  </button>
+	</div> <!-- form-group// -->
+	<p class="text-center"><a href="https://www.github.com/password_reset" class="btn">Forgot password?</a></p>
+	</form>
+</article>
+</div> <!-- card.// -->
+
+	</aside> <!-- col.// -->
+</div> <!-- row.// -->
+
+</div> 
+<script>
+      $('#submitLogin').on('click', function() {
+        var un = $("input#loginID").val();
+        var pw = $("input#password").val();
+        var dashboardURL = "projectDashboard.html";
+        var redirect = false;
+        $.ajax({
+          type: "POST",
+          url: "https://api.github.com/authorizations",
+          dataType: "text",
+          data: '{ "scopes": ["user","repo"], "note": "test" }',
+          headers: {
+            'Authorization': 'Basic ' + btoa(un + ':' + pw),
+            'Content-Type': 'application/json'
+          },
+          cache: false,
+          async: false,
+          success: function (data, status, xhr){
+            redirect = true;
+          },
+          error: function (xhr, status, error){
+            var json = JSON.parse(xhr.responseText);
+            if (xhr.status === 422 && json.errors[0].code === "already_exists"){
+              <!-- if (xhr.status === 422 and json.errors[0].code === "already_exists"){ -->
+              <!-- auth was successful but token already exists -->
+              redirect = true;
+            } else {
+              alert("Error: " + xhr.status + " " +status); 
+            }
+          }
+        });
+        if (redirect === true) {
+            document.location.replace(dashboardURL);
+        }
+    });
+    </script>
+<!--container end.//-->
