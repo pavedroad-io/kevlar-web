@@ -8,10 +8,10 @@ TARGET := $(PROJECTNAME)
 
 # Go related variables.
 GOBASE := $(shell cd ../../;pwd)
-#GOPATH := $(GOBASE)/vendor:$(GOBASE)
 GOPATH := $(GOBASE)
 GOBIN := $(GOBASE)/bin
 GOFILES := $(wildcard *.go)
+GODEPS := $(shell ./printdeps.sh)
 GOLINT := $(shell which golint)
 ASSETS := "$(PROJDIR)/assets/images"
 
@@ -31,7 +31,7 @@ PID := /tmp/.$(PROJECTNAME).pid
 
 .PHONY: check go-build compile sonar-scanner
 
-all: check compile
+all: compile check
 
 ## install: Install missing dependencies. Runs `go get` internally. e.g; make install get=github.com/foo/bar
 install: go-get
@@ -90,12 +90,12 @@ Gopkg: Gopkg.toml
 	@echo "  >  initialize dep support..."
 	dep init
 
-go-get: $(ASSETS)
-	@echo "  >  Checking if there is any missing dependencies..."
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
+go-get: $(GODEPS)
 	@echo "  >  Creating dependencies graph png..."
 	$(shell dep status -dot | dot -T png -o $(ASSETS)/$(PROJECTNAME).png)
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get $(get)
+
+$(GODEPS):
+	$(shell dep ensure $?)
 
 go-install:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go install $(GOFILES)
@@ -104,9 +104,13 @@ go-clean:
 	@echo "  >  Cleaning build cache"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean
 
-check: sonar-scanner lint
+check: sonar-scanner lint kompose
+	@echo "  >  Starting cockroach DB..."
+	docker-compose -f docker-db-only.yaml up -d
 	@echo "  >  running to tests..."
 	go test -v ./...
+	@echo "  >  Stopping cockroach DB..."
+	docker-compose -f docker-db-only.yaml down
 
 sonar-scanner:
 	./sonarcloud.sh
@@ -115,6 +119,9 @@ lint: $(GOFILES)
 	@echo "  >  running lint..."
 	@echo $?
 	$(GOLINT) $?
+
+kompose:
+	kompose convert -f docker-compose.yaml
 
 fmt: $(GOFILES)
 	@gofmt -l -w $?

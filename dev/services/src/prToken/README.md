@@ -1,4 +1,29 @@
-# CI Status
+# prToken
+Stores user token in a cockroachDB.  These tokens are used to manage access to remote sites like GitHub.
+
+## API
+OpenAPI integration coming
+
+## Commands and files
+
+### make
+- make check; runs test
+- make compile; build binaries
+- make; creates a docker image
+- docker-compose.yaml; used with docker-compose up to start all microservices
+- docker-db-only.yaml; start cockroachdb only for executing tests
+- manages dependencies with dep
+- produces microservice readme with png of dependencies
+- (kcompse)[http://kompose.io/] Create Kubernetes services and deployments deployment YMAL
+INFO Kubernetes file "prtoken-service.yaml" created 
+INFO Kubernetes file "roach-ui-service.yaml" created 
+INFO Kubernetes file "prtoken-deployment.yaml" created 
+INFO Kubernetes file "roach-ui-deployment.yaml" created 
+INFO Kubernetes file "roach-ui-claim0-persistentvolumeclaim.yaml" created 
+*PV resources still needs to be provided for cockroach to starta*
+
+
+## CI Status
 TODO: build status from CI server
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pavedroad-io_kevlar-web&metric=alert_status)](https://sonarcloud.io/dashboard?id=pavedroad-io_kevlar-web)
 
