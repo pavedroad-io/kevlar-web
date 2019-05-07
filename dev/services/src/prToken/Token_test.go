@@ -75,6 +75,7 @@ func TestMain(m *testing.M) {
 		serverAddr,
 		serverPort)
 
+	clearDB()
 	ensureTableExists()
 
 	code := m.Run()
@@ -85,8 +86,9 @@ func TestMain(m *testing.M) {
 }
 
 func ensureTableExists() {
+	fmt.Println(tableCreationQuery)
 	if _, err := a.DB.Exec(tableCreationQuery); err != nil {
-		fmt.Println("Table check failed")
+		fmt.Println("Table check failed:", err)
 		log.Fatal(err)
 	}
 
@@ -98,14 +100,20 @@ func ensureTableExists() {
 
 func clearTable() {
 	a.DB.Exec("DELETE FROM kevlarweb.prToken")
-	a.DB.Exec("ALTER TABLE kevlarweb.prToken AUTO_INCREMENT = 1")
+        a.DB.Exec("ALTER TABLE kevlarweb.prToken AUTO_INCREMENT = 1")
+
+}
+
+func clearDB() {
+	a.DB.Exec("DROP DATABASE IF EXISTS kevlarweb")
+	a.DB.Exec("CREATE DATABASE kevlarweb")
 }
 
 const tableCreationQuery = `
 CREATE TABLE IF NOT EXISTS kevlarweb.prToken (
     uid UUID DEFAULT uuid_v4()::UUID PRIMARY KEY,
     prToken JSONB
-)`
+);`
 
 const indexCreateToken = `
 CREATE INDEX IF NOT EXISTS prTokenIdx ON kevlarweb.prToken USING GIN (prToken)`

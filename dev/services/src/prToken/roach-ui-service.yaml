@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.17.0 (a74acad)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: roach-ui
+  name: roach-ui
+spec:
+  ports:
+  - name: "26257"
+    port: 26257
+    targetPort: 26257
+  - name: "6060"
+    port: 6060
+    targetPort: 8080
+  selector:
+    io.kompose.service: roach-ui
+status:
+  loadBalancer: {}
