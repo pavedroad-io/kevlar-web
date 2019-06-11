@@ -11,6 +11,7 @@ import (
 	"os"
 )
 
+// PrToken data structure for token storage
 type PrToken struct {
 	APIVersion string `json:"apiVersion"`
 	Kind       string `json:"kind"`
@@ -139,7 +140,7 @@ func (t *PrToken) getToken(db *sql.DB, uid string) error {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		rowCount += 1
+    rowCount++
 	}
 
 	if rowCount == 0 {

@@ -20,10 +20,13 @@ import (
 )
 
 const (
-	//
+  // PrTokenAPIVersion Version API URL
 	PrTokenAPIVersion       string = "/api/v1"
+  // PrTokenNamespaceID Prefix for namespaces
 	PrTokenNamespaceID      string = "namespace"
+  // PrTokenDefaultNamespace Default namespace
 	PrTokenDefaultNamespace string = "pavedroad.io"
+  // PrTokenResourceType CRD Type per k8s
 	PrTokenResourceType     string = "prTokens"
 )
 
@@ -33,10 +36,10 @@ type prTokenApp struct {
 }
 
 func (a *prTokenApp) Initialize(user, password, dbname string, sslmode string, sqldriver string,
-	dbIp string, dbPort string, ip_addr string, ip_port string) {
+	dbIP string, dbPort string, ipAddr string, ipPort string) {
 
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s port=%s",
-		user, password, dbname, sslmode, dbIp, dbPort)
+		user, password, dbname, sslmode, dbIP, dbPort)
 
 	//fmt.Println(sqldriver, connectionString)
 	var err error
@@ -136,11 +139,11 @@ func (a *prTokenApp) getTokens(w http.ResponseWriter, r *http.Request) {
 }
 
 // getToken: return a token given a UID
-func (t *prTokenApp) getToken(w http.ResponseWriter, r *http.Request) {
+func (a *prTokenApp) getToken(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	Token := PrToken{}
 
-	err := Token.getToken(t.DB, vars["uid"])
+	err := Token.getToken(a.DB, vars["uid"])
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 		return

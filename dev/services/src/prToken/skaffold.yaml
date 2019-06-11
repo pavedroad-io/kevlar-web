@@ -1,0 +1,13 @@
+apiVersion: skaffold/v1beta9
+kind: Config
+build:
+  artifacts:
+  - image: kevlar/prtoken:0.0
+deploy:
+  kubectl:
+    manifests:
+    - prtoken-deployment.yaml
+    - prtoken-service.yaml
+    - roach-ui-claim0-persistentvolumeclaim.yaml
+    - roach-ui-deployment.yaml
+    - roach-ui-service.yaml

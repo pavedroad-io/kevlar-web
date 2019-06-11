@@ -46,9 +46,9 @@ func TestMain(m *testing.M) {
 		dbDriver = "postgres"
 	}
 
-	dbIp := os.Getenv("APP_DB_IP")
-	if dbIp == "" {
-		dbIp = "127.0.0.1"
+	dbIP := os.Getenv("APP_DB_IP")
+	if dbIP == "" {
+		dbIP = "127.0.0.1"
 	}
 
 	dbPort := os.Getenv("APP_DB_PORT")
@@ -70,7 +70,7 @@ func TestMain(m *testing.M) {
 		database,
 		sslMode,
 		dbDriver,
-		dbIp,
+		dbIP,
 		dbPort,
 		serverAddr,
 		serverPort)
