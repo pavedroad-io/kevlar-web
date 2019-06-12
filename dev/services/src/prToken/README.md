@@ -50,8 +50,8 @@ INFO Kubernetes file "roach-ui-claim0-persistentvolumeclaim.yaml" created
 
 ### Documentation
 - doc/microserice
--- prToken.png dependecy graph
--- prTokenAPI.html Open API specification
+    - prToken.png dependecy graph
+    - prTokenAPI.html Open API specification
 
 ## CI Status
 - TODO: github release
