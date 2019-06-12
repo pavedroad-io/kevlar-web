@@ -15,6 +15,7 @@ GODEPS := $(shell ./printdeps.sh)
 GOLINT := $(shell which golint)
 GOCOVERAGE := coverage.out
 GOLINTREPORT := lint.out
+GOTESTREPORT := "https://sonarcloud.io/dashboard?id=pavedroad-io_kevlar-web"
 ASSETS := "$(PROJDIR)/assets/images"
 
 SHELL := /bin/bash
@@ -120,6 +121,8 @@ sonar-scanner:
 show-coverage:
 	go tool cover -html=$(GOCOVERAGE)
 
+show-test:
+	xdg-open $(GOTESTREPORT)
 
 lint: $(GOFILES)
 	@echo "  >  running lint..."
