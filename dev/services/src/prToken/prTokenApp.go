@@ -59,7 +59,7 @@ const (
   // PrTokenResourceType CRD Type per k8s
 	PrTokenResourceType     string = "prTokens"
 
-  prUidToken              string ="/{uid}"
+  prUIDToken              string ="/{uid}"
 )
 
 type prTokenApp struct {
@@ -186,13 +186,13 @@ func (a *prTokenApp) initializeRoutes() {
 
 	//update a token
 	uri = PrTokenAPIVersion + "/" + PrTokenNamespaceID + "/{namespace}/" +
-		PrTokenResourceType + prUidToken
+		PrTokenResourceType + prUIDToken
 	a.Router.HandleFunc(uri, a.updateToken).Methods("PUT")
 	fmt.Println("PUT" + uri)
 
 	//delete a token
 	uri = PrTokenAPIVersion + "/" + PrTokenNamespaceID + "/{namespace}/" +
-		PrTokenResourceType + prUidToken
+		PrTokenResourceType + prUIDToken
 	a.Router.HandleFunc(uri, a.deleteToken).Methods("DELETE")
 	fmt.Println("DELETE" + uri)
 

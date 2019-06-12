@@ -21,7 +21,7 @@ const (
   prCreated     string = "created"
   prActive      string = "active"
   prMeta        string = "metadata"
-  prTokenUrl    string = "/api/v1/namespace/pavedroad.io/prTokens/%s"
+  prTokenURL    string = "/api/v1/namespace/pavedroad.io/prTokens/%s"
 )
 
 var a prTokenApp
@@ -260,7 +260,7 @@ func TestUpdateUser(t *testing.T) {
   nt := NewToken()
   uid := addToken(nt)
 
-  statement := fmt.Sprintf(prTokenUrl, uid)
+  statement := fmt.Sprintf(prTokenURL, uid)
 	req, _ := http.NewRequest("GET", statement, nil)
 	response := executeRequest(req)
 
@@ -302,7 +302,7 @@ func TestDeleteToken(t *testing.T) {
   nt := NewToken()
   uid := addToken(nt)
 
-  statement := fmt.Sprintf(prTokenUrl, uid)
+  statement := fmt.Sprintf(prTokenURL, uid)
 	req, _ := http.NewRequest("DELETE", statement, nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)

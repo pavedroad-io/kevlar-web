@@ -36,13 +36,16 @@ OpenAPI integration coming
 - docker-db-only.yaml; start cockroachdb only for executing tests
 
 ### Manifests generation
-- (kcompse)[http://kompose.io/] Create Kubernetes services and deployments deployment YMAL
+(kcompse)[http://kompose.io/] Create Kubernetes services and deployments deployment YMAL
+
+```
 INFO Kubernetes file "prtoken-service.yaml" created 
 INFO Kubernetes file "roach-ui-service.yaml" created 
 INFO Kubernetes file "prtoken-deployment.yaml" created 
 INFO Kubernetes file "roach-ui-deployment.yaml" created 
 INFO Kubernetes file "roach-ui-claim0-persistentvolumeclaim.yaml" created 
 *PV resources still needs to be provided for cockroach to start*
+```
 
 ### Documentation
 - doc/microserice
@@ -50,10 +53,10 @@ INFO Kubernetes file "roach-ui-claim0-persistentvolumeclaim.yaml" created
 -- prTokenAPI.html Open API specification
 
 ## CI Status
-TODO: build status from CI server
-TODO: github release
-DOCKER pull requets
-Go Report Card
-FOSSA Status
-Slack
-Twitter following
+- TODO: build status from CI server
+- TODO: github release
+- TODO: DOCKER pull requets
+- TODO: Go Report Card
+- TODO: FOSSA Status
+- TODO: Slack
+- TODO: Twitter following
