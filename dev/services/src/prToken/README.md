@@ -8,6 +8,7 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=pavedroad-io_kevlar-web&metric=security_rating)](https://sonarcloud.io/dashboard?id=pavedroad-io_kevlar-web)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=pavedroad-io_kevlar-web&metric=sqale_index)](https://sonarcloud.io/dashboard?id=pavedroad-io_kevlar-web)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=pavedroad-io_kevlar-web&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=pavedroad-io_kevlar-web)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fpavedroad-io%2Fkevlar-web.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fpavedroad-io%2Fkevlar-web?ref=badge_shield)
 
 # prToken
 Stores user token in a cockroachDB.  These tokens are used to manage access to remote sites like GitHub.
@@ -53,10 +54,8 @@ INFO Kubernetes file "roach-ui-claim0-persistentvolumeclaim.yaml" created
 -- prTokenAPI.html Open API specification
 
 ## CI Status
-- TODO: build status from CI server
 - TODO: github release
 - TODO: DOCKER pull requets
 - TODO: Go Report Card
-- TODO: FOSSA Status
 - TODO: Slack
 - TODO: Twitter following
