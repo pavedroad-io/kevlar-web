@@ -1,8 +1,15 @@
 apiVersion: skaffold/v1beta9
 kind: Config
 build:
+  insecureRegistries:
+    - localhost:32000
   artifacts:
-  - image: kevlar/prtoken:0.0
+  - image: localhost:32000/prtoken
+    context: .
+    docker:
+      dockerfile: Dockerfile
+  local:
+    useDockerCLI: true
 deploy:
   kubectl:
     manifests:

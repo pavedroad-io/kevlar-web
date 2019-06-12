@@ -82,6 +82,8 @@ go-compile: go-get go-build
 go-build:
 	@echo "  >  Building binary..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROJECTNAME) $(GOFILES)
+	cp $(GOBIN)/$(PROJECTNAME) .
+	skaffold run
 
 go-generate: Gopkg
 	@echo "  >  Generating dependency files..."
@@ -123,6 +125,10 @@ show-coverage:
 
 show-test:
 	xdg-open $(GOTESTREPORT)
+
+show-devkit:
+	xdg-open http://localhost:5000/microk8sDevKit.html
+
 
 lint: $(GOFILES)
 	@echo "  >  running lint..."

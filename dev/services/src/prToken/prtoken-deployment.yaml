@@ -18,7 +18,7 @@ spec:
         io.kompose.service: prtoken
     spec:
       containers:
-      - image: kevlar/prtoken:0.0
+      - image: localhost:32000/prtoken
         name: prtoken
         ports:
         - containerPort: 8081
