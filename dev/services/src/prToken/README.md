@@ -32,6 +32,48 @@ OpenAPI integration coming
 - make fmt            Enforce go coding standard
 - make simplify       Simplify go code 
 
+### skaffold integration
+Durring the `make compile` phase of a build several things happen:
+
+- After the go binary is built, a copy is made in the local directory.  The local binary is necessary for building the docker image.  Docker expects all files to be in the current build context.  The build context is the directory pass to the docker deaemon.  In this case that is "." for the current working directory.
+- It then issues executes the `skaffold run` command.  This command builds the docker image, tags it with the current git commit-id, executes any specified container-tests, and then pushes the deployment to the local microk8s cluster.  The requires enabling the microk8s repository service with microk8s.enable repository.
+
+### Handy commands to know:
+
+##### Find the kubernetes dashboard endpoint
+To find the IP address for your local microk8s cluster issue the following kubectl command.  Then use the IP address, 10.152.183.68 in this case, to access the Kubernetes dashboard in your browser.  For `example, https://10.152.183.68`.
+```
+microk8s.kubectl --namespace=kube-system describe service kubernetes-dashboard
+Name:              kubernetes-dashboard
+Namespace:         kube-system
+Labels:            k8s-app=kubernetes-dashboard
+Annotations:       kubectl.kubernetes.io/last-applied-configuration:
+                     {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"kubernetes-dashboard"},"name":"kubernetes-dashboard"...
+Selector:          k8s-app=kubernetes-dashboard
+Type:              ClusterIP
+IP:                10.152.183.68
+Port:              <unset>  443/TCP
+TargetPort:        8443/TCP
+Endpoints:         10.1.1.32:8443
+Session Affinity:  None
+Events:            <none>
+```
+
+##### skaffold
+Use `skaffold run` to build, tag, test, and deploy the current microservice to your local cluster.
+Use `skaffold run --tail` to display logs
+Use `skaffold delete` to remove an prior deployed version of your microservice.
+Use `skaffold build` to generate a docker image.
+
+##### docker/microk8s repository
+The microk8s repository runs on port 32000.  To see the current list of deployed images use the following command:
+```
+docker images localhost:32000/prtoken
+REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
+localhost:32000/prtoken   04b5e67-dirty       f50a616e1f70        2 hours ago         783MB
+```
+If you are using a VM, change localhost to the IP address of your VM.
+
 ### Docker files
 - docker-compose.yaml; used with docker-compose up to start all microservices
 - docker-db-only.yaml; start cockroachdb only for executing tests
