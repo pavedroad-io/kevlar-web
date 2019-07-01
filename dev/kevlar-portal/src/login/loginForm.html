@@ -38,7 +38,7 @@
 	</div> <!-- input-group.// -->
 	</div> <!-- form-group// -->
 	<div class="form-group">
-	<button id="submitLogin" type="submit" class="btn btn-primary btn-block"> Login  </button>
+	<button id="submitLogin" type="button" class="btn btn-primary btn-block"> Login  </button>
 	</div> <!-- form-group// -->
 	<p class="text-center"><a href="https://www.github.com/password_reset" class="btn">Forgot password?</a></p>
 	</form>
@@ -55,7 +55,6 @@
         var pw = $("input#password").val();
         var dashboardURL = "projectDashboard.html";
         var redirect = false;
-        debugger;
         $.ajax({
           type: "POST",
           url: "https://api.github.com/authorizations",
@@ -81,7 +80,6 @@
             }
           }
         });
-        debugger;
         if (redirect === true) {
             document.location.replace(dashboardURL);
         }
