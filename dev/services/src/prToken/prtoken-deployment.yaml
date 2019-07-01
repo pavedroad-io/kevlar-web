@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.17.0 (a74acad)
+    kompose.version: 1.18.0 (06a2e56)
   creationTimestamp: null
   labels:
     io.kompose.service: prtoken
@@ -18,7 +18,7 @@ spec:
         io.kompose.service: prtoken
     spec:
       containers:
-      - image: kevlar/prtoken:0.0
+      - image: localhost:32000/prtoken
         name: prtoken
         ports:
         - containerPort: 8081

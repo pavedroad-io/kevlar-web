@@ -14,11 +14,10 @@ ENV ms prToken
 ENV kevlar /kevlar
 ENV kevlarbin $kevlar/$ms
 
-
 # make working directory, move to it, and copy in prToken ms
 RUN mkdir ${kevlar}
 WORKDIR ${kevlar}
-Add $ms $kevlar
+COPY $ms $kevlar
 
 EXPOSE 8081
 CMD ["/bin/sh", "-c", "$kevlarbin"]

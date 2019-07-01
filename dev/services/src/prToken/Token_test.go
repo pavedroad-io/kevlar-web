@@ -16,77 +16,33 @@ import (
 	_ "reflect"
 	"testing"
 )
+const (
+  prUpdated     string = "updated"
+  prCreated     string = "created"
+  prActive      string = "active"
+  prMeta        string = "metadata"
+  prTokenURL    string = "/api/v1/namespace/pavedroad.io/prTokens/%s"
+)
 
 var a prTokenApp
 
 func TestMain(m *testing.M) {
 	a = prTokenApp{}
-	username := os.Getenv("APP_DB_USERNAME")
-	if username == "" {
-		username = "root"
-	}
-
-	password := os.Getenv("APP_DB_PASSWORD")
-	if password == "" {
-		password = ""
-	}
-
-	database := os.Getenv("APP_DB_NAME")
-	if database == "" {
-		database = "kevlar-web"
-	}
-
-	sslMode := os.Getenv("APP_DB_SSL_MODE")
-	if sslMode == "" {
-		sslMode = "disable"
-	}
-
-	dbDriver := os.Getenv("APP_DB_SQL_DRIVER")
-	if dbDriver == "" {
-		dbDriver = "postgres"
-	}
-
-	dbIp := os.Getenv("APP_DB_IP")
-	if dbIp == "" {
-		dbIp = "127.0.0.1"
-	}
-
-	dbPort := os.Getenv("APP_DB_PORT")
-	if dbPort == "" {
-		dbPort = "26257"
-	}
-
-	serverAddr := os.Getenv("IP_ADDR")
-	if serverAddr == "" {
-		serverAddr = "127.0.0.1"
-	}
-	serverPort := os.Getenv("IP_PORT")
-	if serverPort == "" {
-		serverPort = "8081"
-	}
-
-	a.Initialize(username,
-		password,
-		database,
-		sslMode,
-		dbDriver,
-		dbIp,
-		dbPort,
-		serverAddr,
-		serverPort)
+	a.Initialize()
 
 	clearDB()
 	ensureTableExists()
 
 	code := m.Run()
 
+  fmt.Println("cleartable")
 	clearTable()
 
 	os.Exit(code)
 }
 
 func ensureTableExists() {
-	fmt.Println(tableCreationQuery)
+  fmt.Println(tableCreationQuery)
 	if _, err := a.DB.Exec(tableCreationQuery); err != nil {
 		fmt.Println("Table check failed:", err)
 		log.Fatal(err)
@@ -189,19 +145,19 @@ func TestCreateToken(t *testing.T) {
 
   // go see this as a date and the conversation time will not be the same as the
   // original data/time
-  if m["created"] == "" {
-    t.Errorf("Expected created to be set. Got '%v'", m["created"])
+  if m[prCreated] == "" {
+    t.Errorf("Expected created to be set. Got '%v'", m[prCreated])
 	}
 
-  if m["updated"] == "" {
-    t.Errorf("Expected updated to be set. Got '%v'", m["created"])
+  if m[prUpdated] == "" {
+    t.Errorf("Expected updated to be set. Got '%v'", m[prCreated])
 	}
 
-	if m["active"] != true {
-		t.Errorf("Expected active to be 'true'. Got '%v'", m["active"])
+	if m[prActive] != true {
+		t.Errorf("Expected active to be 'true'. Got '%v'", m[prActive])
 	}
 
-	testName := m["metadata"].(map[string]interface{})["name"]
+	testName := m[prMeta].(map[string]interface{})["name"]
 	if testName != "testuser-github-token" {
 		t.Errorf("Expected user name to be 'testuser-github-token'. Got '%v'", testName)
 	}
@@ -213,27 +169,27 @@ func TestCreateToken(t *testing.T) {
 		//t.Errorf("Expected user uid to be '4601415d-7d00-4707-8fba-151eb9a0a75e'.\nGot %#v", testName)
 	//}
 
-	testName = m["metadata"].(map[string]interface{})["namespace"]
+	testName = m[prMeta].(map[string]interface{})["namespace"]
 	if testName != "jscharber" {
 		t.Errorf("Expected namespace to be 'jscharber'. Got '%v'", testName)
 	}
 
-	testName = m["metadata"].(map[string]interface{})["site"]
+	testName = m[prMeta].(map[string]interface{})["site"]
 	if testName != "github" {
 		t.Errorf("Expected site to be 'github'. Got '%v'", testName)
 	}
 
-	testName = m["metadata"].(map[string]interface{})["endPoint"]
+	testName = m[prMeta].(map[string]interface{})["endPoint"]
 	if testName != "https://api.github.com" {
 		t.Errorf("Expected endPoint to be 'https://api.github.com'. Got '%v'", testName)
 	}
 
-	testName = m["metadata"].(map[string]interface{})["token"]
+	testName = m[prMeta].(map[string]interface{})["token"]
 	if testName != "mytoken" {
 		t.Errorf("Expected token to be 'mytoken'. Got '%v'", testName)
 	}
 
-	testName = m["metadata"].(map[string]interface{})["scope"]
+	testName = m[prMeta].(map[string]interface{})["scope"]
 	if testName == "" {
 		t.Errorf("Expected scope to be set")
 	}
@@ -304,7 +260,7 @@ func TestUpdateUser(t *testing.T) {
   nt := NewToken()
   uid := addToken(nt)
 
-  statement := fmt.Sprintf("/api/v1/namespace/pavedroad.io/prTokens/%s", uid)
+  statement := fmt.Sprintf(prTokenURL, uid)
 	req, _ := http.NewRequest("GET", statement, nil)
 	response := executeRequest(req)
 
@@ -334,7 +290,7 @@ func TestUpdateUser(t *testing.T) {
 		t.Errorf("Expected active to be faluse. Got %v", m["id"])
 	}
 
-  testName := m["metadata"].(map[string]interface{})["name"]
+  testName := m[prMeta].(map[string]interface{})["name"]
   if testName != "updatedname" {
     t.Errorf("Expected name to be 'updatedname'. Got '%v'", testName)
   }
@@ -346,7 +302,7 @@ func TestDeleteToken(t *testing.T) {
   nt := NewToken()
   uid := addToken(nt)
 
-  statement := fmt.Sprintf("/api/v1/namespace/pavedroad.io/prTokens/%s", uid)
+  statement := fmt.Sprintf(prTokenURL, uid)
 	req, _ := http.NewRequest("DELETE", statement, nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)

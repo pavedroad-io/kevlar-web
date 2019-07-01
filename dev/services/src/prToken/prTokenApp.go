@@ -19,12 +19,47 @@ import (
 	"time"
 )
 
+// Username for database access
+var Username = "root"
+
+// Password for database access
+var Password = ""
+
+// Database name
+var Database = "kevlar-web"
+
+// SslMode disabled or enable
+var	SslMode = "disable"
+
+// DbDriver default to postgres
+var	DbDriver = "postgres"
+
+// DbIP IP address for server
+var	DbIP = "127.0.0.1"
+
+// DbPort IP port for server
+var	DbPort = "26257"
+
+// ServerAddr IP address that the microservice will listen on
+var ServerAddr = "127.0.0.1"
+
+// ServerPort IP port that the microservice will listen on
+var ServerPort = "8081"
+
+// ServerString combines ServerAdrr:SeverPort
+var ServerString string
+
 const (
-	//
+  // PrTokenAPIVersion Version API URL
 	PrTokenAPIVersion       string = "/api/v1"
+  // PrTokenNamespaceID Prefix for namespaces
 	PrTokenNamespaceID      string = "namespace"
+  // PrTokenDefaultNamespace Default namespace
 	PrTokenDefaultNamespace string = "pavedroad.io"
+  // PrTokenResourceType CRD Type per k8s
 	PrTokenResourceType     string = "prTokens"
+
+  prUIDToken              string ="/{uid}"
 )
 
 type prTokenApp struct {
@@ -32,15 +67,17 @@ type prTokenApp struct {
 	DB     *sql.DB
 }
 
-func (a *prTokenApp) Initialize(user, password, dbname string, sslmode string, sqldriver string,
-	dbIp string, dbPort string, ip_addr string, ip_port string) {
+func (a *prTokenApp) Initialize() {
 
+	a.initializeEnvironment()
+
+  // Build connection strings
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s port=%s",
-		user, password, dbname, sslmode, dbIp, dbPort)
+		Username, Password, Database, SslMode, DbIP, DbPort)
+  ServerString = fmt.Sprintf("%s:%s", ServerAddr, ServerPort)
 
-	//fmt.Println(sqldriver, connectionString)
 	var err error
-	a.DB, err = sql.Open(sqldriver, connectionString)
+	a.DB, err = sql.Open(DbDriver, connectionString)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,8 +86,61 @@ func (a *prTokenApp) Initialize(user, password, dbname string, sslmode string, s
 	a.initializeRoutes()
 }
 
+// Start the server
 func (a *prTokenApp) Run(addr string) {
 	log.Fatal(http.ListenAndServe(addr, a.Router))
+}
+
+// Get for ennvironment variable overrides
+func (a *prTokenApp) initializeEnvironment() {
+  var envVar = ""
+
+  //look for environment variables overrides
+	envVar = os.Getenv("APP_DB_USERNAME")
+	if envVar != "" {
+		Username = envVar
+	}
+
+	envVar = os.Getenv("APP_DB_PASSWORD")
+	if envVar != "" {
+		Password = envVar
+	}
+
+	envVar = os.Getenv("APP_DB_NAME")
+	if envVar != "" {
+		Database = envVar
+	}
+	envVar = os.Getenv("APP_DB_SSL_MODE")
+	if envVar != "" {
+		SslMode = envVar
+	}
+
+	envVar = os.Getenv("APP_DB_SQL_DRIVER")
+	if envVar != "" {
+		DbDriver = envVar
+	}
+
+	envVar = os.Getenv("APP_DB_IP")
+	if envVar != "" {
+		DbIP = envVar
+	}
+
+	envVar = os.Getenv("APP_DB_PORT")
+	if envVar != "" {
+		DbPort = envVar
+	}
+
+	envVar = os.Getenv("IP_ADDR")
+	if envVar != "" {
+		ServerAddr = envVar
+	}
+
+	envVar = os.Getenv("IP_PORT")
+	if envVar != "" {
+		ServerPort = envVar
+	}
+
+
 }
 
 // endpoints for prToken microservice
@@ -96,13 +186,13 @@ func (a *prTokenApp) initializeRoutes() {
 
 	//update a token
 	uri = PrTokenAPIVersion + "/" + PrTokenNamespaceID + "/{namespace}/" +
-		PrTokenResourceType + "/{uid}"
+		PrTokenResourceType + prUIDToken
 	a.Router.HandleFunc(uri, a.updateToken).Methods("PUT")
 	fmt.Println("PUT" + uri)
 
 	//delete a token
 	uri = PrTokenAPIVersion + "/" + PrTokenNamespaceID + "/{namespace}/" +
-		PrTokenResourceType + "/{uid}"
+		PrTokenResourceType + prUIDToken
 	a.Router.HandleFunc(uri, a.deleteToken).Methods("DELETE")
 	fmt.Println("DELETE" + uri)
 
@@ -136,11 +226,11 @@ func (a *prTokenApp) getTokens(w http.ResponseWriter, r *http.Request) {
 }
 
 // getToken: return a token given a UID
-func (t *prTokenApp) getToken(w http.ResponseWriter, r *http.Request) {
+func (a *prTokenApp) getToken(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	Token := PrToken{}
 
-	err := Token.getToken(t.DB, vars["uid"])
+	err := Token.getToken(a.DB, vars["uid"])
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 		return
@@ -184,7 +274,6 @@ func (a *prTokenApp) createToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//fmt.Println(Token)
 	respondWithJSON(w, http.StatusCreated, Token)
 }
 
@@ -224,7 +313,6 @@ func (a *prTokenApp) updateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//fmt.Println(Token)
 	respondWithJSON(w, http.StatusOK, Token)
 
 }

@@ -13,6 +13,9 @@ GOBIN := $(GOBASE)/bin
 GOFILES := $(wildcard *.go)
 GODEPS := $(shell ./printdeps.sh)
 GOLINT := $(shell which golint)
+GOCOVERAGE := coverage.out
+GOLINTREPORT := lint.out
+GOTESTREPORT := "https://sonarcloud.io/dashboard?id=pavedroad-io_kevlar-web"
 ASSETS := "$(PROJDIR)/assets/images"
 
 SHELL := /bin/bash
@@ -79,6 +82,8 @@ go-compile: go-get go-build
 go-build:
 	@echo "  >  Building binary..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROJECTNAME) $(GOFILES)
+	cp $(GOBIN)/$(PROJECTNAME) .
+	skaffold run
 
 go-generate: Gopkg
 	@echo "  >  Generating dependency files..."
@@ -108,17 +113,27 @@ check: sonar-scanner lint kompose
 	@echo "  >  Starting cockroach DB..."
 	docker-compose -f docker-db-only.yaml up -d
 	@echo "  >  running to tests..."
-	go test -v ./...
+	go test -coverprofile=$(GOCOVERAGE) -v ./...
 	@echo "  >  Stopping cockroach DB..."
 	docker-compose -f docker-db-only.yaml down
 
 sonar-scanner:
 	./sonarcloud.sh
 
+show-coverage:
+	go tool cover -html=$(GOCOVERAGE)
+
+show-test:
+	xdg-open $(GOTESTREPORT)
+
+show-devkit:
+	xdg-open http://localhost:5000/microk8sDevKit.html
+
+
 lint: $(GOFILES)
 	@echo "  >  running lint..."
 	@echo $?
-	$(GOLINT) $?
+	$(GOLINT) $? > $(GOLINTREPORT)
 
 kompose:
 	kompose convert -f docker-compose.yaml
