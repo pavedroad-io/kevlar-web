@@ -1,6 +1,5 @@
 // main_test.go
 
-
 package main
 
 import (
@@ -12,17 +11,18 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
+	"reflect"
 	_ "strconv"
+	"strings"
 	"testing"
-  "reflect"
-  "time"
+	"time"
 )
+
 const (
-  prUpdated     string = "updated"
-  prCreated     string = "created"
-  prActive      string = "active"
-  prUserIdMapperURL    string = "/api/v1/namespace/pavedroad.io/prUserIdMappers/%s"
+	prUpdated         string = "updated"
+	prCreated         string = "created"
+	prActive          string = "active"
+	prUserIdMapperURL string = "/api/v1/namespace/pavedroad.io/prUserIdMappers/%s"
 )
 
 var a prUserIdMapperApp
@@ -36,14 +36,14 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 
-  fmt.Println("cleartable")
+	fmt.Println("cleartable")
 	clearTable()
 
 	os.Exit(code)
 }
 
 func ensureTableExists() {
-  //fmt.Println(tableCreationQuery)
+	//fmt.Println(tableCreationQuery)
 	if _, err := a.DB.Exec(tableCreationQuery); err != nil {
 		fmt.Println("Table check failed:", err)
 		log.Fatal(err)
@@ -128,7 +128,6 @@ func TestCreatePrUserIdMapper(t *testing.T) {
   "updated": "",
   "active": "true"}`)
 
-
 	req, _ := http.NewRequest("POST", "/api/v1/namespace/pavedroad.io/prUserIdMappers", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 
@@ -158,32 +157,32 @@ func TestCreatePrUserIdMapper(t *testing.T) {
 		t.Errorf("Expected userUUID to be '', Got '%v'", m["userUUID"])
 	}
 
-  // numbers are converted to float64
-  var ec float64 = 1
+	// numbers are converted to float64
+	var ec float64 = 1
 	if m["loginCount"] != ec {
 		t.Errorf("Expected loginCount to be 1, Got %v", m["loginCount"])
 	}
 
-  //Test we can decode the data
-  cs, ok :=  m["created"].(string)
-  if ok {
-    c, err := time.Parse(time.RFC3339, cs)
-  	if err != nil {
-  		t.Errorf("Parse failed on parse updated time Got '%v'", c)
-  	}
-  } else {
-  		t.Errorf("Expected updated of string type Got '%v'", reflect.TypeOf(m["updated"]))
-  }
+	//Test we can decode the data
+	cs, ok := m["created"].(string)
+	if ok {
+		c, err := time.Parse(time.RFC3339, cs)
+		if err != nil {
+			t.Errorf("Parse failed on parse updated time Got '%v'", c)
+		}
+	} else {
+		t.Errorf("Expected updated of string type Got '%v'", reflect.TypeOf(m["updated"]))
+	}
 
-  us, ok :=  m["updated"].(string)
-  if ok {
-    u, err := time.Parse(time.RFC3339, us)
-  	if err != nil {
-  		t.Errorf("Parse failed on parse updated time Got '%v'", u)
-  	}
-  } else {
-  		t.Errorf("Expected updated of string type Got '%v'", reflect.TypeOf(m["updated"]))
-  }
+	us, ok := m["updated"].(string)
+	if ok {
+		u, err := time.Parse(time.RFC3339, us)
+		if err != nil {
+			t.Errorf("Parse failed on parse updated time Got '%v'", u)
+		}
+	} else {
+		t.Errorf("Expected updated of string type Got '%v'", reflect.TypeOf(m["updated"]))
+	}
 
 	if m["active"] != "true" {
 		t.Errorf("Expected active to be 'true', Got '%v'", m["active"])
@@ -192,56 +191,56 @@ func TestCreatePrUserIdMapper(t *testing.T) {
 }
 
 func TestMarshallprUsreIdMapper(t *testing.T) {
-  nt := NewPrUserIdMapper()
-  _, err := json.Marshal(nt)
-  if err != nil {
-    t.Errorf("Marshal of prUserIdMapper failed: Got '%v'", err)
-  }
+	nt := NewPrUserIdMapper()
+	_, err := json.Marshal(nt)
+	if err != nil {
+		t.Errorf("Marshal of prUserIdMapper failed: Got '%v'", err)
+	}
 }
 
 func addPrUserIdMapper(t *prUserIdMapper) (cred string) {
 
-  statement := fmt.Sprintf("INSERT INTO pavedroad.pruseridmapper(apiVersion, objVersion, kind, credential, userUUID, loginCount, created, updated, active) VALUES('%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s');",
-    t.APIVersion, t.ObjVersion, t.Kind, t.Credential, t.UserUUID, t.LoginCount,
-    t.Created, t.Updated, t.Active)
-  //fmt.Println(statement)
+	statement := fmt.Sprintf("INSERT INTO pavedroad.pruseridmapper(apiVersion, objVersion, kind, credential, userUUID, loginCount, created, updated, active) VALUES('%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s');",
+		t.APIVersion, t.ObjVersion, t.Kind, t.Credential, t.UserUUID, t.LoginCount,
+		t.Created, t.Updated, t.Active)
+	//fmt.Println(statement)
 
-  rows, er1 := a.DB.Query(statement)
+	rows, er1 := a.DB.Query(statement)
 
-  if er1 != nil {
-    log.Printf("Insert failed for: %s", t.Credential)
-    log.Printf("SQL Error: %s", er1)
-    return ""
-  }
+	if er1 != nil {
+		log.Printf("Insert failed for: %s", t.Credential)
+		log.Printf("SQL Error: %s", er1)
+		return ""
+	}
 
-  defer rows.Close()
+	defer rows.Close()
 
-  return t.Credential
+	return t.Credential
 }
 
 //create a token, set default values
-func NewPrUserIdMapper () (t* prUserIdMapper) {
-  n := prUserIdMapper{
-  APIVersion: "core.pavedroad.io/v1alpha1",
-  Kind: "prUserIdMapper",
-  ObjVersion: "v1beta1",
-  Credential: "foobar@youspace.com",
-  UserUUID: "",
-  LoginCount: 0,
-  Created: "2002-10-02T15:00:00.05Z",
-  Updated: "2002-10-02T15:00:00.05Z",
-  Active: "true"}
+func NewPrUserIdMapper() (t *prUserIdMapper) {
+	n := prUserIdMapper{
+		APIVersion: "core.pavedroad.io/v1alpha1",
+		Kind:       "prUserIdMapper",
+		ObjVersion: "v1beta1",
+		Credential: "foobar@youspace.com",
+		UserUUID:   "",
+		LoginCount: 0,
+		Created:    "2002-10-02T15:00:00.05Z",
+		Updated:    "2002-10-02T15:00:00.05Z",
+		Active:     "true"}
 
-  return &n
+	return &n
 }
 
 //test getting a mapper
 func TestGetPrUserIdMapper(t *testing.T) {
 	clearTable()
-  nt := NewPrUserIdMapper()
-  cred := addPrUserIdMapper(nt)
+	nt := NewPrUserIdMapper()
+	cred := addPrUserIdMapper(nt)
 
-  statement := fmt.Sprintf("/api/v1/namespace/pavedroad.io/prUserIdMappers/%s", cred)
+	statement := fmt.Sprintf("/api/v1/namespace/pavedroad.io/prUserIdMappers/%s", cred)
 
 	req, _ := http.NewRequest("GET", statement, nil)
 	response := executeRequest(req)
@@ -249,28 +248,51 @@ func TestGetPrUserIdMapper(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 }
 
+//test incrementing loginCout
+func TestIncrementPrUserIdMapper(t *testing.T) {
+	clearTable()
+	nt := NewPrUserIdMapper()
+	cred := addPrUserIdMapper(nt)
+
+	statement := fmt.Sprintf("/api/v1/namespace/pavedroad.io/prUserIdMappers/%s", cred)
+
+	req, _ := http.NewRequest("GET", statement, nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	response2 := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response2.Code)
+
+	json.Unmarshal(response2.Body.Bytes(), &nt)
+
+	if nt.LoginCount != 2 {
+		t.Errorf("Expected loginCount to be 2. Got %v", nt.LoginCount)
+	}
+}
+
+
 func TestUpdateUser(t *testing.T) {
 	clearTable()
-  nt := NewPrUserIdMapper()
-  cred := addPrUserIdMapper(nt)
+	nt := NewPrUserIdMapper()
+	cred := addPrUserIdMapper(nt)
 
-  statement := fmt.Sprintf(prUserIdMapperURL, cred)
+	statement := fmt.Sprintf(prUserIdMapperURL, cred)
 	req, _ := http.NewRequest("GET", statement, nil)
 	response := executeRequest(req)
 
 	//var originalPrUserIdMapper map[string]interface{}
 	json.Unmarshal(response.Body.Bytes(), &nt)
 
-  ut := nt
+	ut := nt
 
-  //Update the new struct
+	//Update the new struct
 	ut.Active = "eslaf"
 	ut.UserUUID = "12345"
 
-  jb, err := json.Marshal(ut)
-  if err != nil {
-    panic(err)
-  }
+	jb, err := json.Marshal(ut)
+	if err != nil {
+		panic(err)
+	}
 
 	req, _ = http.NewRequest("PUT", statement, strings.NewReader(string(jb)))
 	response = executeRequest(req)
@@ -292,10 +314,10 @@ func TestUpdateUser(t *testing.T) {
 
 func TestDeletePrUserIdMapper(t *testing.T) {
 	clearTable()
-  nt := NewPrUserIdMapper()
-  cred := addPrUserIdMapper(nt)
+	nt := NewPrUserIdMapper()
+	cred := addPrUserIdMapper(nt)
 
-  statement := fmt.Sprintf(prUserIdMapperURL, cred)
+	statement := fmt.Sprintf(prUserIdMapperURL, cred)
 	req, _ := http.NewRequest("DELETE", statement, nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)

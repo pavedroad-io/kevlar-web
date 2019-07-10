@@ -6,8 +6,8 @@ package main
 
 import (
 	_ "bytes"
+	"context"
 	"database/sql"
-  "context"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -16,10 +16,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-  _ "os/signal"
-  _ "path/filepath"
-  _ "strings"
+	_ "os/signal"
+	_ "path/filepath"
 	"strconv"
+	_ "strings"
 	"time"
 )
 
@@ -27,19 +27,19 @@ import (
 //
 func (a *prUserIdMapperApp) Initialize() {
 
-  // Override defaults
+	// Override defaults
 	a.initializeEnvironment()
 
-  // Build connection strings
+	// Build connection strings
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s port=%s",
 		dbconf.username,
-    dbconf.password,
-    dbconf.database,
-    dbconf.sslMode,
-    dbconf.ip,
-    dbconf.port)
+		dbconf.password,
+		dbconf.database,
+		dbconf.sslMode,
+		dbconf.ip,
+		dbconf.port)
 
-  httpconf.listenString = fmt.Sprintf("%s:%s", httpconf.ip, httpconf.port)
+	httpconf.listenString = fmt.Sprintf("%s:%s", httpconf.ip, httpconf.port)
 
 	var err error
 	a.DB, err = sql.Open(dbconf.dbDriver, connectionString)
@@ -54,40 +54,40 @@ func (a *prUserIdMapperApp) Initialize() {
 // Start the server
 func (a *prUserIdMapperApp) Run(addr string) {
 
-  log.Println("Listing at: " + addr)
-  srv := &http.Server{
-        Handler:      a.Router,
-        Addr:         addr,
-        WriteTimeout: httpconf.writeTimeout * time.Second,
-        ReadTimeout:  httpconf.readTimeout * time.Second,
-  }
+	log.Println("Listing at: " + addr)
+	srv := &http.Server{
+		Handler:      a.Router,
+		Addr:         addr,
+		WriteTimeout: httpconf.writeTimeout * time.Second,
+		ReadTimeout:  httpconf.readTimeout * time.Second,
+	}
 
-  go func() {
-        if err := srv.ListenAndServe(); err != nil {
-            log.Println(err)
-        }
-   }()
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
 
-  // Listen for SIGHUP
-  c := make(chan os.Signal, 1)
-  <-c
+	// Listen for SIGHUP
+	c := make(chan os.Signal, 1)
+	<-c
 
-  // Create a deadline to wait for.
-  ctx, cancel := context.WithTimeout(context.Background(), httpconf.shutdownTimeout)
-  defer cancel()
+	// Create a deadline to wait for.
+	ctx, cancel := context.WithTimeout(context.Background(), httpconf.shutdownTimeout)
+	defer cancel()
 
-  // Doesn't block if no connections, but will otherwise wait
-  // until the timeout deadline.
-  srv.Shutdown(ctx)
-  log.Println("shutting down")
-  os.Exit(0)
+	// Doesn't block if no connections, but will otherwise wait
+	// until the timeout deadline.
+	srv.Shutdown(ctx)
+	log.Println("shutting down")
+	os.Exit(0)
 }
 
 // Get for ennvironment variable overrides
 func (a *prUserIdMapperApp) initializeEnvironment() {
-  var envVar = ""
+	var envVar = ""
 
-  //look for environment variables overrides
+	//look for environment variables overrides
 	envVar = os.Getenv("APP_DB_USERNAME")
 	if envVar != "" {
 		dbconf.username = envVar
@@ -134,37 +134,37 @@ func (a *prUserIdMapperApp) initializeEnvironment() {
 
 	envVar = os.Getenv("HTTP_READ_TIMEOUT")
 	if envVar != "" {
-    to, err := strconv.Atoi(envVar)
-    if err == nil {
-      log.Printf("failed to convert HTTP_READ_TIMEOUT: %s to int", envVar)
-    } else {
-		  httpconf.readTimeout = time.Duration(to) * time.Second
-    }
-    log.Printf("Read timeout: %d", httpconf.readTimeout)
+		to, err := strconv.Atoi(envVar)
+		if err == nil {
+			log.Printf("failed to convert HTTP_READ_TIMEOUT: %s to int", envVar)
+		} else {
+			httpconf.readTimeout = time.Duration(to) * time.Second
+		}
+		log.Printf("Read timeout: %d", httpconf.readTimeout)
 	}
 
 	envVar = os.Getenv("HTTP_WRITE_TIMEOUT")
 	if envVar != "" {
-    to, err := strconv.Atoi(envVar)
-    if err == nil {
-      log.Printf("failed to convert HTTP_READ_TIMEOUT: %s to int", envVar)
-    } else {
-		  httpconf.writeTimeout = time.Duration(to) * time.Second
-    }
-    log.Printf("Write timeout: %d", httpconf.writeTimeout)
+		to, err := strconv.Atoi(envVar)
+		if err == nil {
+			log.Printf("failed to convert HTTP_READ_TIMEOUT: %s to int", envVar)
+		} else {
+			httpconf.writeTimeout = time.Duration(to) * time.Second
+		}
+		log.Printf("Write timeout: %d", httpconf.writeTimeout)
 	}
 
 	envVar = os.Getenv("HTTP_SHUTDOWN_TIMEOUT")
 	if envVar != "" {
-    if envVar != "" {
-      to, err := strconv.Atoi(envVar)
-      if err != nil {
-        httpconf.shutdownTimeout = time.Second * time.Duration(to)
-      } else {
-        httpconf.shutdownTimeout = time.Second * httpconf.shutdownTimeout
-      }
-    log.Println("Shutdown timeout", httpconf.shutdownTimeout)
-    }
+		if envVar != "" {
+			to, err := strconv.Atoi(envVar)
+			if err != nil {
+				httpconf.shutdownTimeout = time.Second * time.Duration(to)
+			} else {
+				httpconf.shutdownTimeout = time.Second * httpconf.shutdownTimeout
+			}
+			log.Println("Shutdown timeout", httpconf.shutdownTimeout)
+		}
 	}
 
 	envVar = os.Getenv("HTTP_LOG")
@@ -207,7 +207,7 @@ func (a *prUserIdMapperApp) initializeRoutes() {
 	a.Router.HandleFunc(uri, a.getUserIdMapper).Methods("GET")
 	fmt.Println("GET" + uri)
 
-  uri = prUserIdMapperAPIVersion + "/" + prUserIdMapperNamespaceID + "/{namespace}/" + prUserIdMapperResourceType
+	uri = prUserIdMapperAPIVersion + "/" + prUserIdMapperNamespaceID + "/{namespace}/" + prUserIdMapperResourceType
 	a.Router.HandleFunc(uri, a.createUserIdMapper).Methods("POST")
 	fmt.Println("POST" + uri)
 
@@ -286,7 +286,7 @@ func (a *prUserIdMapperApp) createUserIdMapper(w http.ResponseWriter, r *http.Re
 		os.Exit(1)
 	}
 
-  //dumpMapper(userIdMapper)
+	//dumpMapper(userIdMapper)
 
 	//var out bytes.Buffer
 	//json.Indent(&out, htmlData, "", "\t")
@@ -297,7 +297,7 @@ func (a *prUserIdMapperApp) createUserIdMapper(w http.ResponseWriter, r *http.Re
 	userIdMapper.Updated = ct.Format(time.RFC3339)
 	userIdMapper.LoginCount = 1
 
-  // Save into backend storage
+	// Save into backend storage
 	if err := userIdMapper.createUserIdMapper(a.DB); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
@@ -367,33 +367,33 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 }
 
 func logRequest(handler http.Handler) http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
-    handler.ServeHTTP(w, r)
-  })
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+		handler.ServeHTTP(w, r)
+	})
 }
 
 func openLogFile(logfile string) {
-  if logfile != "" {
-    lf, err := os.OpenFile(logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0640)
+	if logfile != "" {
+		lf, err := os.OpenFile(logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0640)
 
-    if err != nil {
-      log.Fatal("OpenLogfile: os.OpenFile:", err)
-    }
+		if err != nil {
+			log.Fatal("OpenLogfile: os.OpenFile:", err)
+		}
 
-    log.SetOutput(lf)
-  }
+		log.SetOutput(lf)
+	}
 }
 
 func dumpMapper(m prUserIdMapper) {
-  fmt.Println("Dump prUserIdMapp")
-  fmt.Printf("apiVersion: %s\n", m.APIVersion)
-  fmt.Printf("objVersion: %s\n", m.ObjVersion)
-  fmt.Printf("kind: %s\n", m.Kind)
-  fmt.Printf("credential: %s\n", m.Credential)
-  fmt.Printf("userUUID: %s\n", m.UserUUID)
-  fmt.Printf("loginCount: %d\n", m.LoginCount)
-  fmt.Printf("created: %s\n", m.Created)
-  fmt.Printf("updated: %s\n", m.Updated)
-  fmt.Printf("active: %s\n", m.Active)
+	fmt.Println("Dump prUserIdMapp")
+	fmt.Printf("apiVersion: %s\n", m.APIVersion)
+	fmt.Printf("objVersion: %s\n", m.ObjVersion)
+	fmt.Printf("kind: %s\n", m.Kind)
+	fmt.Printf("credential: %s\n", m.Credential)
+	fmt.Printf("userUUID: %s\n", m.UserUUID)
+	fmt.Printf("loginCount: %d\n", m.LoginCount)
+	fmt.Printf("created: %s\n", m.Created)
+	fmt.Printf("updated: %s\n", m.Updated)
+	fmt.Printf("active: %s\n", m.Active)
 }
