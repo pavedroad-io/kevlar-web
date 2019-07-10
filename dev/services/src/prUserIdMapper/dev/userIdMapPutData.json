@@ -1,0 +1,11 @@
+{
+  "apiVersion" :"core.pavedroad.io/v1alpha1",
+  "objVersion": "v1beta2",
+  "kind" : "prUserIdMapper",
+  "login": "john@scharber.com",
+  "userUUID": "1234123",
+  "loginCount": 10,
+	"created": "",
+	"updated": "",
+	"active": "true"
+}
