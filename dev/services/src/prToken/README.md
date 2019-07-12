@@ -174,7 +174,7 @@ If you are using a VM, change localhost to the IP address of your VM.
 - docker-db-only.yaml; start cockroachdb only for executing tests
 
 ### Manifests generation
-(kcompse)[http://kompose.io/] Create Kubernetes services and deployments deployment YMAL
+(kompose)[http://kompose.io/] Create Kubernetes services and deployments deployment YAML
 
 ```
 INFO Kubernetes file "prtoken-service.yaml" created 
@@ -186,7 +186,7 @@ INFO Kubernetes file "roach-ui-claim0-persistentvolumeclaim.yaml" created
 ```
 
 ### Documentation
-- doc/microserice
+- doc/microservice
     - prToken.png dependecy graph
     - prTokenAPI.html Open API specification
 
