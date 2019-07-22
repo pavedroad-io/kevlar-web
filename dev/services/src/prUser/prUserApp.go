@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+  _ "github.com/gorilla/handlers"
 	_ "github.com/lib/pq"
 	"io/ioutil"
 	"log"
@@ -264,6 +265,7 @@ func (a *prUserApp) getUser(w http.ResponseWriter, r *http.Request) {
 		    return
      }
 	   err = User.getUser(a.DB, vars["key"], UUID)
+     fmt.Println("err : ", err)
 	}
 
 	if err != nil {
@@ -294,9 +296,6 @@ func (a *prUserApp) createUser(w http.ResponseWriter, r *http.Request) {
 
 	//dumpUser(user)
 
-	//var out bytes.Buffer
-	//json.Indent(&out, htmlData, "", "\t")
-	//out.WriteTo(os.Stdout)
 
 	ct := time.Now().UTC()
 	user.Created = ct.Format(time.RFC3339)
@@ -387,17 +386,18 @@ func openLogFile(logfile string) {
 	}
 }
 
-/*
-func dumpUser(m prUser) {
+func dumpUser(m prUser) (error) {
+  jb, err := json.Marshal(t)
+
+  if err != nil {
+    log.Println("marshall failed")
+    return err
+  }
+
 	fmt.Println("Dump prUserIdMapp")
-	fmt.Printf("apiVersion: %s\n", m.APIVersion)
-	fmt.Printf("objVersion: %s\n", m.ObjVersion)
-	fmt.Printf("kind: %s\n", m.Kind)
-	fmt.Printf("credential: %s\n", m.Credential)
-	fmt.Printf("userUUID: %s\n", m.UserUUID)
-	fmt.Printf("loginCount: %d\n", m.LoginCount)
-	fmt.Printf("created: %s\n", m.Created)
-	fmt.Printf("updated: %s\n", m.Updated)
-	fmt.Printf("active: %s\n", m.Active)
+	var out bytes.Buffer
+	json.Indent(&out, jb, "", "\t")
+	out.WriteTo(os.Stdout)
+
+  return nil
 }
-*/

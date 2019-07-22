@@ -18,7 +18,7 @@ type prUser struct {
 	ObjVersion string                `json:"objVersion"`
 	Kind       string                `json:"kind"`
 	Metadata   userMetadata          `json: "metadata"`
-	Labels     []map[string](string) `json: "labels"`
+  Labels     map[string](string)   `json: "labels"`
 	Created    string                `json:"created,ignoreempty"`
 	Updated    string                `json:"updated,ignoreempty"`
 	Active     string                `json:"active"`
@@ -29,7 +29,7 @@ type userMetadata struct {
 	Name      string                `json:"name"`
 	Namespace string                `json:"namespace"`
 	UUID      string                `json:"uuid"`
-	Profiles  []map[string](string) `json:"profiles,ignoreempty"`
+	Profiles  map[string](string)   `json:"profiles,ignoreempty"`
 }
 
 // userList of selected attributes
