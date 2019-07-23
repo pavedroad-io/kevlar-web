@@ -35,8 +35,8 @@ OpenAPI integration coming
 ### skaffold integration
 Durring the `make compile` phase of a build several things happen:
 
-- After the go binary is built, a copy is made in the local directory.  The local binary is necessary for building the docker image.  Docker expects all files to be in the current build context.  The build context is the directory pass to the docker deaemon.  In this case that is "." for the current working directory.
-- It then issues executes the `skaffold run` command.  This command builds the docker image, tags it with the current git commit-id, executes any specified container-tests, and then pushes the deployment to the local microk8s cluster.  The requires enabling the microk8s repository service with microk8s.enable repository.
+- After the go binary is built, a copy is made in the local directory.  The local binary is necessary for building the docker image.  Docker expects all files to be in the current build context.  The build context is the directory passed to the docker deaemon.  In this case that is "." for the current working directory.
+- It then issues the `skaffold run` command.  This command builds the docker image, tags it with the current git commit-id, executes any specified container-tests, and then pushes the deployment to the local microk8s cluster.  This requires enabling the microk8s repository service with microk8s.enable repository.
 
 Sample output:
 ```
@@ -142,10 +142,10 @@ Events:            <none>
 ```
 
 ##### skaffold
-Use `skaffold run` to build, tag, test, and deploy the current microservice to your local cluster.
+Use `skaffold run` to build, tag, test, and deploy the current microservice to your local cluster
 Use `skaffold run --tail` to display logs
-Use `skaffold delete` to remove an prior deployed version of your microservice.
-Use `skaffold build` to generate a docker image.
+Use `skaffold delete` to remove an prior deployed version of your microservice
+Use `skaffold build` to generate a docker image
 
 Sample of skaffold delete output:
 ```
@@ -174,7 +174,7 @@ If you are using a VM, change localhost to the IP address of your VM.
 - docker-db-only.yaml; start cockroachdb only for executing tests
 
 ### Manifests generation
-(kcompse)[http://kompose.io/] Create Kubernetes services and deployments deployment YMAL
+(kompose)[http://kompose.io/] Create Kubernetes services and deployments deployment YAML
 
 ```
 INFO Kubernetes file "prtoken-service.yaml" created 
@@ -186,7 +186,7 @@ INFO Kubernetes file "roach-ui-claim0-persistentvolumeclaim.yaml" created
 ```
 
 ### Documentation
-- doc/microserice
+- doc/microservice
     - prToken.png dependecy graph
     - prTokenAPI.html Open API specification
 
