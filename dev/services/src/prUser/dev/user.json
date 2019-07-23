@@ -1,0 +1,19 @@
+{
+  "apiVersion" :"core.pavedroad.io/v1alpha1",
+  "objVersion": "v1beta1",
+  "kind" : "prUser",
+  "metadata": {
+    "name" : "test",
+    "namespace" : "pavedroad",
+    "uuid" : "",
+    "profiles" : [
+      {"key": "value"}
+     ]
+  },
+  "labels": [
+      {"key": "value"}
+  ],
+  "created": "",
+  "updated": "",
+  "active": "true"
+}
