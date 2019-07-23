@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"time"
   "github.com/google/uuid"
+  "bytes"
 )
 
 // Initialize setups database connection object and the http server
@@ -386,8 +387,8 @@ func openLogFile(logfile string) {
 	}
 }
 
-func dumpUser(m prUser) (error) {
-  jb, err := json.Marshal(t)
+func dumpUser(u prUser) (error) {
+  jb, err := json.Marshal(u)
 
   if err != nil {
     log.Println("marshall failed")

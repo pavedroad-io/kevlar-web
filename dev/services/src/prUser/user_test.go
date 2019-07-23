@@ -345,3 +345,15 @@ func TestDeletePrUser(t *testing.T) {
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 }
+
+func TestDumpPrUser(t *testing.T) {
+	nt := NewPrUser()
+
+  err := dumpUser(*nt)
+
+	if err != nil {
+		t.Errorf("Expected erro to be nill. Got %v", err)
+	}
+}
+
+
