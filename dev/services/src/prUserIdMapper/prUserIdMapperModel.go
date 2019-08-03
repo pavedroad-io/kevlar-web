@@ -13,17 +13,92 @@ import (
 	_ "os"
 )
 
-// prUserIdMapper data structure for token storage
+// A GenericError is the default error message that is generated.
+// For certain status codes there are more appropriate error structures.
+//
+// swagger:response genericError
+type GenericError struct {
+	// in: body
+	Body struct {
+		Code    int32 `json:"code"`
+		Message error `json:"message"`
+	} `json:"body"`
+}
+
+// Return a basic message as json in the body
+//
+// swagger:response statusResponse
+type statusResponse struct {
+	// in: body
+  msg error `json:"message"`
+}
+
+// Return list of mappings
+//
+// swagger:response tokenList
+type listResponse struct {
+	// in: body
+  mappingList []prUserIdMapper `json:"mappings"`
+}
+
+// prUserIdMapper data structure for mapper storage
+// It is used to map a 3rd party credential to an interanl UUID
+//
+// swagger:model userIdMapper
 type prUserIdMapper struct {
+  // API verions
+  //
+  // required: true
 	APIVersion string `json:"apiVersion"`
+
+  // Object verions
+  //
+  // required: true
 	ObjVersion string `json:"objVersion"`
+
+  // Type of object
+  //
+  // required: true
 	Kind       string `json:"kind"`
+
+  // 3rd party credential: email, login, or key
+  //
+  // required: true
 	Credential string `json:"login"`
+
+  // PR user ID 
+  //
+  // required: true
 	UserUUID   string `json:"userUUID"`
+
+  // Number of times this user has logged in
+  //
+  // readonly
 	LoginCount int    `json:"loginCount"`
+
+  // Time this record was creaetd
+  //
+  // readonly
 	Created    string `json:"created,ignoreempty"`
+
+  // Time this record was last updated
+  //
+  // readonly
 	Updated    string `json:"updated,ignoreempty"`
+
+  // Is this an active user true or false, default true
+  //
+  // required: false
 	Active     string `json:"active"`
+}
+// An Mapper response model
+//
+// This is used for returning a response with a single mapper as body
+//
+// swagger:response mapperResponse
+type MapperResponse struct {
+	// in: body
+	response string `json:"order"`
 }
 
 // updateUserIdMapper in database

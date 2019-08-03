@@ -223,8 +223,15 @@ func (a *prUserIdMapperApp) initializeRoutes() {
 
 }
 
-// getUserIdMappers
+// prUserIdMappersLIST
 // return a list of all tokens
+// getUserIdMappers swagger:route GET /prUserIdMappersLIST userIdMappers getUserIdMappers
+//
+// Returns a list of tokens
+//
+// Responses:
+//    default: genericError
+//        200: tokenList
 func (a *prUserIdMapperApp) getUserIdMappers(w http.ResponseWriter, r *http.Request) {
 	UserIdMapper := prUserIdMapper{}
 
@@ -250,7 +257,13 @@ func (a *prUserIdMapperApp) getUserIdMappers(w http.ResponseWriter, r *http.Requ
 	respondWithJSON(w, http.StatusOK, mappings)
 }
 
-// getUserIdMapper: return a token given a key
+// getUserIdMapper swagger:route GET /prUserIdMappers/{uuid} userIdMappers getUserIdMapper
+//
+// Returns a token given a key
+//
+// Responses:
+//    default: genericError
+//        200: mapperResponse
 func (a *prUserIdMapperApp) getUserIdMapper(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	UserIdMapper := prUserIdMapper{}
@@ -264,8 +277,14 @@ func (a *prUserIdMapperApp) getUserIdMapper(w http.ResponseWriter, r *http.Reque
 	respondWithJSON(w, http.StatusOK, UserIdMapper)
 }
 
-// createUserIdMapper
-// Use POST to create a token
+// createUserIdMapper swagger:route POST /prUserIdMappers userIdMappers createUserIdMapper
+//
+// Returns a token given a key
+//
+// Responses:
+//    default: genericError
+//        201: mapperResponse
+//        400: genericError
 func (a *prUserIdMapperApp) createUserIdMapper(w http.ResponseWriter, r *http.Request) {
 	// New map structure
 	userIdMapper := prUserIdMapper{}
@@ -306,8 +325,14 @@ func (a *prUserIdMapperApp) createUserIdMapper(w http.ResponseWriter, r *http.Re
 	respondWithJSON(w, http.StatusCreated, userIdMapper)
 }
 
-// updateUserIdMapper
-// Use PUT to update a token
+// updateUserIdMapper swagger:route PUT /prUserIdMappers/{uuid} userIdMappers updateUserIdMapper
+//
+// Update a mapping specified by UUID
+//
+// Responses:
+//    default: genericError
+//        201: mapperResponse
+//        400: genericError
 func (a *prUserIdMapperApp) updateUserIdMapper(w http.ResponseWriter, r *http.Request) {
 	userIdMapper := prUserIdMapper{}
 
@@ -339,8 +364,14 @@ func (a *prUserIdMapperApp) updateUserIdMapper(w http.ResponseWriter, r *http.Re
 
 }
 
-// deleteUserIdMapper
-// Use DELETE to delete a token
+// deleteUserIdMapper swagger:route DELETE /prUserIdMappers/{uuid} userIdMappers deleteUserIdMapper
+//
+// Update a mapping specified by UUID
+//
+// Responses:
+//    default: genericError
+//        200: statusResponse
+//        400: genericError
 func (a *prUserIdMapperApp) deleteUserIdMapper(w http.ResponseWriter, r *http.Request) {
 	UserIdMapper := prUserIdMapper{}
 	vars := mux.Vars(r)

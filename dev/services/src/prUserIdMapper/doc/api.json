@@ -1,0 +1,252 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Given a key, login, or email address return the PR UUID",
+    "title": "Microservice for mapping multiple 3rd party id into internal ID",
+    "termsOfService": "there are no TOS at this moment, use at your own risk we take no responsibility",
+    "contact": {
+      "name": "John Scharber",
+      "url": "http://john.pavedroad.io",
+      "email": "john@pavedroad.io"
+    },
+    "license": {
+      "name": "Apache 2"
+    },
+    "version": "0.0.1"
+  },
+  "host": "api.pavedroad.io",
+  "basePath": "/api/v1/namespace/pavedroad.io/prUserIdMappers",
+  "paths": {
+    "/prUserIdMappers": {
+      "post": {
+        "description": "Returns a token given a key",
+        "tags": [
+          "userIdMappers"
+        ],
+        "operationId": "createUserIdMapper",
+        "responses": {
+          "201": {
+            "$ref": "#/responses/mapperResponse"
+          },
+          "400": {
+            "$ref": "#/responses/genericError"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/prUserIdMappers/{uuid}": {
+      "get": {
+        "description": "Returns a token given a key",
+        "tags": [
+          "userIdMappers"
+        ],
+        "operationId": "getUserIdMapper",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/mapperResponse"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "put": {
+        "description": "Update a mapping specified by UUID",
+        "tags": [
+          "userIdMappers"
+        ],
+        "operationId": "updateUserIdMapper",
+        "responses": {
+          "201": {
+            "$ref": "#/responses/mapperResponse"
+          },
+          "400": {
+            "$ref": "#/responses/genericError"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      },
+      "delete": {
+        "description": "Update a mapping specified by UUID",
+        "tags": [
+          "userIdMappers"
+        ],
+        "operationId": "deleteUserIdMapper",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/statusResponse"
+          },
+          "400": {
+            "$ref": "#/responses/genericError"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/prUserIdMappersLIST": {
+      "get": {
+        "description": "Returns a list of tokens",
+        "tags": [
+          "userIdMappers"
+        ],
+        "operationId": "getUserIdMappers",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/tokenList"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "GenericError": {
+      "description": "For certain status codes there are more appropriate error structures.",
+      "type": "object",
+      "title": "A GenericError is the default error message that is generated.",
+      "properties": {
+        "body": {
+          "description": "in: body",
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer",
+              "format": "int32",
+              "x-go-name": "Code"
+            },
+            "message": {
+              "type": "string",
+              "x-go-name": "Message"
+            }
+          },
+          "x-go-name": "Body"
+        }
+      },
+      "x-go-package": "prUserIdMapper"
+    },
+    "MapperResponse": {
+      "description": "This is used for returning a response with a single mapper as body",
+      "type": "object",
+      "title": "An Mapper response model",
+      "x-go-package": "prUserIdMapper"
+    },
+    "listResponse": {
+      "description": "Return list of mappings",
+      "type": "object",
+      "x-go-package": "prUserIdMapper"
+    },
+    "statusResponse": {
+      "description": "Return a basic message as json in the body",
+      "type": "object",
+      "x-go-package": "prUserIdMapper"
+    },
+    "userIdMapper": {
+      "description": "prUserIdMapper data structure for mapper storage\nIt is used to map a 3rd party credential to an interanl UUID",
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "objVersion",
+        "kind",
+        "login",
+        "userUUID"
+      ],
+      "properties": {
+        "active": {
+          "description": "Is this an active user true or false, default true",
+          "type": "string",
+          "x-go-name": "Active"
+        },
+        "apiVersion": {
+          "description": "API verions",
+          "type": "string",
+          "x-go-name": "APIVersion"
+        },
+        "created": {
+          "description": "Time this record was creaetd\n\nreadonly",
+          "type": "string",
+          "x-go-name": "Created"
+        },
+        "kind": {
+          "description": "Type of object",
+          "type": "string",
+          "x-go-name": "Kind"
+        },
+        "login": {
+          "description": "3rd party credential: email, login, or key",
+          "type": "string",
+          "x-go-name": "Credential"
+        },
+        "loginCount": {
+          "description": "Number of times this user has logged in\n\nreadonly",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "LoginCount"
+        },
+        "objVersion": {
+          "description": "Object verions",
+          "type": "string",
+          "x-go-name": "ObjVersion"
+        },
+        "updated": {
+          "description": "Time this record was last updated\n\nreadonly",
+          "type": "string",
+          "x-go-name": "Updated"
+        },
+        "userUUID": {
+          "description": "PR user ID ",
+          "type": "string",
+          "x-go-name": "UserUUID"
+        }
+      },
+      "x-go-name": "prUserIdMapper",
+      "x-go-package": "prUserIdMapper"
+    }
+  },
+  "responses": {
+    "genericError": {
+      "description": "A GenericError is the default error message that is generated.\nFor certain status codes there are more appropriate error structures.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "x-go-name": "Code"
+          },
+          "message": {
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "mapperResponse": {
+      "description": "An Mapper response model\n\nThis is used for returning a response with a single mapper as body"
+    },
+    "statusResponse": {
+      "description": "Return a basic message as json in the body"
+    },
+    "tokenList": {
+      "description": "Return list of mappings"
+    }
+  }
+}
