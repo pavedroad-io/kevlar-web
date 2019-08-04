@@ -74,7 +74,7 @@ clean:
 	@-rm $(GOBIN)/$(PROJECTNAME) 2> /dev/null
 	@-$(MAKE) go-clean
 
-go-compile: go-get go-build
+go-compile: go-get api-doc go-build
 
 go-build:
 	@echo "  >  Building binary..."
@@ -95,6 +95,13 @@ Gopkg.toml:
 go-get: Gopkg.toml get-deps $(ASSETS)
 	@echo "  >  Creating dependencies graph png..."
 	$(shell dep status -dot | dot -T png -o $(ASSETS)/$(PROJECTNAME).png)
+
+api-doc:
+	@echo "  >  Generate swagger specification..."
+	swagger generate spec -m -t $(PROJECTNAME) -o doc/api.json
+	@echo "  >  Generate HTML..."
+	pretty-swag -i doc/api.json -o doc/api.html
+	@echo "  >  Done"
 
 get-deps:
 	$(shell GOPATH=$(GOPATH);dep ensure $?)

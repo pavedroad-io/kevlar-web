@@ -223,8 +223,6 @@ func (a *prUserIdMapperApp) initializeRoutes() {
 
 }
 
-// prUserIdMappersLIST
-// return a list of all tokens
 // getUserIdMappers swagger:route GET /prUserIdMappersLIST userIdMappers getUserIdMappers
 //
 // Returns a list of tokens
